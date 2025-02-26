@@ -181,24 +181,29 @@ FROM layoffs_staging2
 WHERE industry IS NULL
 OR industry = '';
 
+
+-- For 'Airbnb,' the industry is 'Travel,' but it appears to be missing.
+-- We will write a query to check if another row has the same company name and location. If found, it will update the industry for null values."
+-- We will first update the blank to Null Values
+
 SELECT *
 FROM layoffs_staging2
 WHERE company = 'Airbnb';
 
-SELECT T1.industry, T2.industry
-FROM layoffs_staging2 T1
-JOIN layoffs_staging2 T2
-	ON T1.company = T2.company
-	AND T1.location = T2.location
-WHERE (T1.industry IS NULL OR T1.industry = '')
-AND T2. industry IS NOT NULL;
+ 
+-- We will first update the blank to Null Values
 
 UPDATE layoffs_staging2
 SET industry = NULL
 WHERE industry = '';
 
+
+
+-- To populate the values
+
+
 SELECT *
-FROm layoffs_staging2;
+FROM layoffs_staging2;
 
 UPDATE layoffs_staging2 T1
 JOIN layoffs_staging2 T2
@@ -208,9 +213,27 @@ SET T1.industry = T2.industry
 WHERE T1.industry IS NULL
 AND T2.industry IS NOT NULL;
 
+
+
+-- 3. Check Null Values 
+-- Before deleting null values, we need to ensure that they cannot be populated anymore; otherwise, we might remove important data that we are supposed to work on. 
+For this reason, we create a separate table to work on while maintaining the table with the raw data.
+
+-- Other Null Values looks normal
+
+	
 SELECT *
 FROM layoffs_staging2;
 
+
+
+-- 4.  Remove unnecessary Rows and Columns
+
+
+-- We cannot do anything about null values in 'total_laid_off' and 'percentage_laid_off' since there is no available data to populate them. 
+Therefore, we can proceed with deleting them..
+
+	
 SELECT *
 FROM layoffs_staging2
 WHERE total_laid_off IS NULL
@@ -220,6 +243,8 @@ DELETE
 FROM layoffs_staging2
 WHERE total_laid_off IS NULL
 AND percentage_laid_off IS NULL;
+
+-- We can also delete the 'row_num' column since it is no longer needed after removing duplicates.
 
 SELECT *
 FROM layoffs_staging2;
